@@ -6,7 +6,6 @@
 
 package org.usfirst.frc.team1165.robot.commands;
 
-import org.usfirst.frc.team1165.robot.RobotMap;
 import org.usfirst.frc.team1165.robot.subsystems.Piston;
 
 import edu.wpi.first.wpilibj.command.Command;
@@ -18,7 +17,7 @@ import edu.wpi.first.wpilibj.command.Command;
  * The timeout is used to determine how long the solenoid should
  * be activated. Subclasses should NOT set or change the timeout.
  */
-public abstract class PistonCommand extends Command
+public abstract class PistonCommand extends Command implements Runnable
 {
     /** Piston subsystems */
     public static Piston piston01 = new Piston(0, 1);
@@ -29,26 +28,22 @@ public abstract class PistonCommand extends Command
 	final static boolean extend = true;
 	final static boolean retract = false;
 	
-	final static double powerOnTime = 0.05; // 50 milliseconds
+	private double powerOnTime = 0.005; // seconds
+	
+	private boolean isFinished;
     
-    public PistonCommand(Piston piston, boolean isExtending)
+    public PistonCommand(Piston piston, boolean isExtending, double powerOnTime)
 	{
-		super(powerOnTime);
 		requires(piston);
         this.piston = piston;
         this.isExtending = isExtending;
+        this.powerOnTime = powerOnTime;
     }
 
     protected void initialize() 
     {
-        if (isExtending) 
-        {
-            piston.extend();
-        }
-		else 
-        {
-            piston.retract();
-        }
+    	isFinished = false;
+    	new Thread(this).start();
     }
 
     protected void execute() 
@@ -57,7 +52,7 @@ public abstract class PistonCommand extends Command
 
     protected boolean isFinished() 
     {
-        return this.isTimedOut();
+        return isFinished;
     }
 
     protected void end() 
@@ -72,7 +67,30 @@ public abstract class PistonCommand extends Command
     
 	private void idle()
 	{
-		// TODO: Uncomment if want to idle the piston when the command is finished or interrupted.
 		piston.idle();
+	}
+	
+	public void run()
+	{
+        if (isExtending) 
+        {
+            piston.extend();
+        }
+		else 
+        {
+            piston.retract();
+        }
+        
+        try
+		{
+			Thread.sleep((long)(powerOnTime * 1000));
+		}
+		catch (InterruptedException e)
+		{
+		}
+        
+        idle();
+
+        isFinished = true;
 	}
 }
