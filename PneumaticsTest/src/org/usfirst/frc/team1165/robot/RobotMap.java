@@ -17,4 +17,7 @@ public class RobotMap
 	// number and the module. For example you with a rangefinder:
 	// public static int rangefinderPort = 1;
 	// public static int rangefinderModule = 1;
+	
+	public static String piston01EnergizeTimeKey = "Piston01 Energize Time (sec)";
+	public static String piston2EnergizeTimeKey = "Piston2 Energize Time (sec)";
 }

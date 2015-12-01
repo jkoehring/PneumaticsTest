@@ -12,44 +12,53 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  */
 public class Piston extends Subsystem
 {
-	private final Solenoid solenoidOut;
-	private final Solenoid solenoidIn;
+	private final Solenoid solenoidExtend;
+	private final Solenoid solenoidRetract;
 
-	public Piston(int solenoidInPort, int solenoidOutPort)
+	public Piston(int solenoidRetractPort, int solenoidExtendPort)
 	{
-		this.solenoidIn = new Solenoid(solenoidInPort);
-		this.solenoidOut = new Solenoid(solenoidOutPort);
+		this.solenoidRetract = solenoidRetractPort >= 0 ? new Solenoid(solenoidRetractPort) : null;
+		this.solenoidExtend = solenoidExtendPort >= 0 ? new Solenoid(solenoidExtendPort) : null;
 	}
 
 	public void extend()
 	{
-		solenoidIn.set(false);
-		solenoidOut.set(true);
+		set(solenoidRetract, false);
+		set(solenoidExtend, true);
 	}
 
 	public void retract()
 	{
-		solenoidIn.set(true);
-		solenoidOut.set(false);
+		set(solenoidRetract, true);
+		set(solenoidExtend, false);
 	}
 
 	public void idle()
 	{
-		solenoidIn.set(false);
-		solenoidOut.set(false);
+		set(solenoidRetract, false);
+		set(solenoidExtend, false);
 	}
 
-	public Solenoid getInSolenoid()
+	public Solenoid getRetractSolenoid()
 	{
-		return solenoidIn;
+		return solenoidRetract;
 	}
 
-	public Solenoid getOutSolenoid()
+	public Solenoid getExtendSolenoid()
 	{
-		return solenoidOut;
+		return solenoidExtend;
 	}
 
+	@Override
 	protected void initDefaultCommand()
 	{
+	}
+	
+	private void set(Solenoid solenoid, boolean state)
+	{
+		if (null != solenoid)
+		{
+			solenoid.set(state);
+		}
 	}
 }

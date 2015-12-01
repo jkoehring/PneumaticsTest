@@ -2,10 +2,9 @@ package org.usfirst.frc.team1165.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import org.usfirst.frc.team1165.robot.commands.ExtendPiston01FullPower;
-import org.usfirst.frc.team1165.robot.commands.ExtendPiston01PartialPower;
-import org.usfirst.frc.team1165.robot.commands.RetractPiston01FullPower;
-import org.usfirst.frc.team1165.robot.commands.RetractPiston01PartialPower;
+import org.usfirst.frc.team1165.robot.commands.ExtendPiston01;
+import org.usfirst.frc.team1165.robot.commands.ExtendPiston2;
+import org.usfirst.frc.team1165.robot.commands.RetractPiston01;
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -43,9 +42,12 @@ public class OI
 	
 	public OI()
 	{
-		SmartDashboard.putData(new ExtendPiston01FullPower());
-		SmartDashboard.putData(new RetractPiston01FullPower());
-		SmartDashboard.putData(new ExtendPiston01PartialPower());
-		SmartDashboard.putData(new RetractPiston01PartialPower());
+		SmartDashboard.putData(new ExtendPiston01());
+		SmartDashboard.putData(new RetractPiston01());
+		
+		SmartDashboard.putData(new ExtendPiston2());
+		
+		SmartDashboard.putNumber("Piston01 Energize Time (sec)", 0.05);
+		SmartDashboard.putNumber("Piston2 Energize Time (sec)", 5.00);
 	}
 }

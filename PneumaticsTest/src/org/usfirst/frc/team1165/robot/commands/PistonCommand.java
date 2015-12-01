@@ -8,19 +8,22 @@ package org.usfirst.frc.team1165.robot.commands;
 
 import org.usfirst.frc.team1165.robot.subsystems.Piston;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
 /**
  * Common base class for all commands that operate a piston.
  * 
- * The timeout is used to determine how long the solenoid should
- * be activated. Subclasses should NOT set or change the timeout.
+ * The energizeTime is used to determine how long a solenoid
+ * should be activated.
  */
-public abstract class PistonCommand extends Command implements Runnable
+public abstract class PistonCommand extends Command
 {
     /** Piston subsystems */
     public static Piston piston01 = new Piston(0, 1);
+    public static Piston piston2 = new Piston(-1, 2);
        
     private final boolean isExtending;
     private final Piston piston;
@@ -28,22 +31,65 @@ public abstract class PistonCommand extends Command implements Runnable
 	final static boolean extend = true;
 	final static boolean retract = false;
 	
-	private double powerOnTime = 0.005; // seconds
+	// Indicates how long a solenoid will be energized
+	private double energizeTime; // seconds
+	
+	// Set this for getting energizeTime from SmartDasboard
+	private String energizeTimeKey;
 	
 	private boolean isFinished;
-    
-    public PistonCommand(Piston piston, boolean isExtending, double powerOnTime)
+	
+	private PistonCommand(Piston piston, boolean isExtending)
 	{
 		requires(piston);
         this.piston = piston;
         this.isExtending = isExtending;
-        this.powerOnTime = powerOnTime;
+	}
+    
+    public PistonCommand(Piston piston, boolean isExtending, double energizeTime)
+	{
+    	this(piston, isExtending);
+        this.energizeTime = energizeTime;
+        this.energizeTimeKey = null;
     }
 
+    public PistonCommand(Piston piston, boolean isExtending, String energizeTimeKey)
+	{
+    	this(piston, isExtending);
+        this.energizeTimeKey = energizeTimeKey;
+    }
+
+    // This method is called once just before a command is started.
     protected void initialize() 
     {
+    	// See if should get time to energize solenoid from SmartDashboard.
+    	if (energizeTimeKey != null)
+    	{
+    		energizeTime = SmartDashboard.getNumber(energizeTimeKey);
+    	}
+    	
     	isFinished = false;
-    	new Thread(this).start();
+    	new Thread(new Runnable()
+		{
+    		@Override
+    		public void run()
+    		{
+    	        if (isExtending) 
+    	        {
+    	            piston.extend();
+    	        }
+    			else 
+    	        {
+    	            piston.retract();
+    	        }
+    	        
+    	       	Timer.delay(energizeTime);
+    	        
+    	        idle();
+
+    	        isFinished = true;
+    		}
+		}).start();
     }
 
     protected void execute() 
@@ -68,29 +114,5 @@ public abstract class PistonCommand extends Command implements Runnable
 	private void idle()
 	{
 		piston.idle();
-	}
-	
-	public void run()
-	{
-        if (isExtending) 
-        {
-            piston.extend();
-        }
-		else 
-        {
-            piston.retract();
-        }
-        
-        try
-		{
-			Thread.sleep((long)(powerOnTime * 1000));
-		}
-		catch (InterruptedException e)
-		{
-		}
-        
-        idle();
-
-        isFinished = true;
 	}
 }
