@@ -32,13 +32,16 @@ public abstract class PistonCommand extends Command
 	final static boolean retract = false;
 	
 	// Indicates how long a solenoid will be energized
-	private double energizeTime; // seconds
+	private double energizeTime = 0.05; // seconds
 	
 	// Set this for getting energizeTime from SmartDasboard
 	private String energizeTimeKey;
 	
 	private boolean isFinished;
 	
+	/**
+	 * Constructor that uses a default energize time.
+	 */
 	private PistonCommand(Piston piston, boolean isExtending)
 	{
 		requires(piston);
@@ -46,6 +49,9 @@ public abstract class PistonCommand extends Command
         this.isExtending = isExtending;
 	}
     
+	/**
+	 * Constructor that uses a fixed energize time.
+	 */
     public PistonCommand(Piston piston, boolean isExtending, double energizeTime)
 	{
     	this(piston, isExtending);
@@ -53,6 +59,9 @@ public abstract class PistonCommand extends Command
         this.energizeTimeKey = null;
     }
 
+    /**
+     * Constructor that uses an energize time from the SmartDashboard.
+     */
     public PistonCommand(Piston piston, boolean isExtending, String energizeTimeKey)
 	{
     	this(piston, isExtending);
